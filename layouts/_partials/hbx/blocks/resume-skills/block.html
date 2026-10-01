@@ -1,0 +1,202 @@
+{{/* Hugo Blox: Skills */}}
+{{/* Documentation: https://hugoblox.com/blocks/ */}}
+{{/* License: https://github.com/HugoBlox/kit/blob/main/LICENSE.md */}}
+
+{{/* Initialise */}}
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+{{ $content := $block.content }}
+{{ if not (reflect.IsMap $content) }}{{ $content = dict }}{{ end }}
+{{ $design := $block.design }}
+{{ if not (reflect.IsMap $design) }}{{ $design = dict }}{{ end }}
+
+{{ $username := "me" }}
+{{ $username_raw := index $content "username" }}
+{{ if eq (printf "%T" $username_raw) "string" }}
+  {{ $username = strings.TrimSpace $username_raw }}
+{{ end }}
+{{ $profile := partial "functions/get_author_profile" $username }}
+
+{{ $skills_raw := $profile.skills }}
+{{ $skills_iter := slice }}
+{{ if reflect.IsSlice $skills_raw }}
+  {{ $skills_iter = $skills_raw }}
+{{ else if and $skills_raw (reflect.IsMap $skills_raw) }}
+  {{ $skills_iter = slice $skills_raw }}
+{{ end }}
+
+{{ $skills := slice }}
+{{ if gt (len $skills_iter) 0 }}
+  {{ range $skills_iter }}
+    {{ if reflect.IsMap . }}
+      {{ $name := "" }}
+      {{ $description := "" }}
+      {{ $color := "" }}
+      {{ $color_border := "" }}
+      {{ $items_raw := index . "items" }}
+      {{ $items_iter := slice }}
+      {{ if reflect.IsSlice $items_raw }}
+        {{ $items_iter = $items_raw }}
+      {{ else if and $items_raw (reflect.IsMap $items_raw) }}
+        {{ $items_iter = slice $items_raw }}
+      {{ end }}
+      {{ $items := slice }}
+
+      {{ with index . "name" }}{{ $name = strings.TrimSpace (printf "%v" .) }}{{ end }}
+      {{ with index . "description" }}{{ $description = strings.TrimSpace (printf "%v" .) }}{{ end }}
+      {{ with index . "color" }}{{ $color = strings.TrimSpace (printf "%v" .) }}{{ end }}
+      {{ with index . "color_border" }}{{ $color_border = strings.TrimSpace (printf "%v" .) }}{{ end }}
+
+      {{ if gt (len $items_iter) 0 }}
+        {{ range $items_iter }}
+          {{ if reflect.IsMap . }}
+            {{ $item_label := "" }}
+            {{ $item_name := "" }}
+            {{ $item_desc := "" }}
+            {{ $item_icon := "" }}
+            {{ $level := "" }}
+
+            {{ with index . "label" }}{{ $item_label = strings.TrimSpace (printf "%v" .) }}{{ end }}
+            {{ with index . "name" }}{{ $item_name = strings.TrimSpace (printf "%v" .) }}{{ end }}
+            {{ with index . "description" }}{{ $item_desc = strings.TrimSpace (printf "%v" .) }}{{ end }}
+            {{ with index . "icon" }}{{ $item_icon = strings.TrimSpace (printf "%v" .) }}{{ end }}
+            {{ with index . "level" }}{{ $level = strings.TrimSpace (printf "%v" .) }}{{ end }}
+
+            {{ if or $item_label $item_name }}
+              {{ $items = $items | append (dict "label" $item_label "name" $item_name "description" $item_desc "icon" $item_icon "level" $level) }}
+            {{ end }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+
+      {{ if and $name (gt (len $items) 0) }}
+        {{ $skills = $skills | append (dict "name" $name "description" $description "color" $color "color_border" $color_border "items" $items) }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $title := "" }}
+{{ $title_raw := index $content "title" }}
+{{ if $title_raw }}{{ $title = strings.TrimSpace (printf "%v" $title_raw) }}{{ end }}
+
+{{ $text := "" }}
+{{ $text_raw := index $content "text" }}
+{{ if $text_raw }}{{ $text = strings.TrimSpace (printf "%v" $text_raw) }}{{ end }}
+
+{{ $columns := partial "functions/coerce_int" (dict "value" (index $design "columns") "default" 2 "min" 1 "max" 5) }}
+
+<div class="flex flex-col items-center max-w-prose mx-auto gap-3 justify-center">
+
+  <div class="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
+    {{ $title | markdownify | emojify }}
+  </div>
+
+  {{ with $text }}<p>{{ . | markdownify | emojify }}</p>{{ end }}
+</div>
+
+<div class="skills-cards grid grid-cols-1 {{ if ge $columns 2 }}md:grid-cols-2{{ end }} {{ if ge $columns 3 }}lg:grid-cols-3{{ end }} {{ if ge $columns 4 }}xl:grid-cols-4{{ end }} {{ if ge $columns 5 }}2xl:grid-cols-5{{ end }} items-start max-w-prose mx-auto gap-3 px-6 md:px-0">
+
+  {{ range $skills }}
+  {{ $color := index . "color" | default "" }}
+  {{ $color_border := index . "color_border" | default "" }}
+  <div class="w-full">
+    <div class="mb-5 text-xl font-bold text-gray-900 dark:text-white">
+      {{ index . "name" | markdownify | emojify }}
+      {{ with index . "description" }}<p>{{ . | markdownify | emojify }}</p>{{ end }}
+    </div>
+    {{ range (index . "items") }}
+
+    <div class="skills-content">
+
+      {{ with index . "icon" }}
+      <span class="skills-icon inline-block">
+        {{ partial "functions/get_icon" (dict "name" . "attributes" "style=\"height: 1em;\"")  }}
+      </span>
+      {{ end }}
+
+      {{ $label := index . "label" | default (index . "name") }}
+      <span class="skills-name text-gray-700 dark:text-gray-300">
+        {{ $label | markdownify | emojify }}
+        {{ with index . "description" }}<p class="skills-description">{{ . | markdownify | emojify }}</p>{{ end }}
+      </span>
+      {{/* Numeric level (1-5) only. */}}
+      {{ $level := 0.0 }}
+      {{ $level_raw := index . "level" }}
+      {{ if $level_raw }}
+        {{ $level_str := strings.TrimSpace (printf "%v" $level_raw) }}
+        {{ if gt (len (findRE "^[0-9]+(?:\\.[0-9]+)?$" $level_str)) 0 }}
+          {{ $level = float $level_str }}
+        {{ end }}
+      {{ end }}
+      {{ if gt $level 5 }}{{ $level = 5 }}{{ end }}
+      {{ if lt $level 0 }}{{ $level = 0 }}{{ end }}
+      {{ if gt $level 0 }}
+      {{ $levelPercent := mul $level 20 }}
+      <div class="skills-wrapper" {{with $color_border}}{{ (printf "style=\"border-color: %s\"" .) | safeHTMLAttr }}{{end}}>
+        <div class="skills-percent" style="width: {{ printf "%.0f" $levelPercent }}%; {{with $color}}{{ (printf "background-color: %s" .) | safeCSS }}{{end}}"></div>
+      </div>
+      {{ end }}
+    </div>
+    {{ end }}
+  </div>
+{{ end }}
+</div>
+
+{{/* ── Desktop "neural network" mind-map (>= 1024px; the cards above are the mobile fallback).
+     Built from the same $skills list. Groups are split across two sides, balanced by skill
+     count (greedy: largest group first, to the lighter side, at most ceil(n/2) per side);
+     yaml order is preserved within each side. Edges are drawn by js/skills-network.js. */}}
+{{ if gt (len $skills) 0 }}
+  {{ $counts := slice }}
+  {{ range $i, $g := $skills }}{{ $counts = $counts | append (dict "i" $i "n" (len (index $g "items"))) }}{{ end }}
+  {{ $max_left := int (math.Ceil (div (float (len $skills)) 2)) }}
+  {{ $max_right := sub (len $skills) $max_left }}
+  {{ $left_idx := slice }}{{ $right_idx := slice }}
+  {{ $left_total := 0 }}{{ $right_total := 0 }}
+  {{ range sort $counts "n" "desc" }}
+    {{ $can_left := lt (len $left_idx) $max_left }}
+    {{ $can_right := lt (len $right_idx) $max_right }}
+    {{ if or (not $can_right) (and $can_left (le $left_total $right_total)) }}
+      {{ $left_idx = $left_idx | append .i }}{{ $left_total = add $left_total .n }}
+    {{ else }}
+      {{ $right_idx = $right_idx | append .i }}{{ $right_total = add $right_total .n }}
+    {{ end }}
+  {{ end }}
+
+  {{ $center_name := $profile.name_given | default $profile.name_display | default $profile.title }}
+  {{ $center_sub := $title | default (i18n "skills") }}
+
+
+  <div class="skills-net" data-skills-net>
+    <svg class="skills-net__edges" aria-hidden="true" focusable="false"></svg>
+    {{ partial "skills-network-side.html" (dict "side" "left" "skills" $skills "indices" $left_idx) }}
+    <div class="net-center">
+      <span class="net-center__name">{{ $center_name }}</span>
+      <span class="net-center__sub">{{ $center_sub | plainify }}</span>
+    </div>
+    {{ partial "skills-network-side.html" (dict "side" "right" "skills" $skills "indices" $right_idx) }}
+  </div>
+
+  {{ $net_js := resources.Get "js/skills-network.js" | resources.Minify | fingerprint "sha256" }}
+  <script defer src="{{ $net_js.RelPermalink }}" integrity="{{ $net_js.Data.Integrity }}"></script>
+{{ end }}
+
+{{/* Inline partial: one side (left/right) of the skills network */}}
+{{ define "_partials/skills-network-side.html" }}
+  {{ $side := .side }}
+  <div class="skills-net__side skills-net__side--{{ $side }}">
+    {{ range $i, $g := .skills }}
+      {{ if in $.indices $i }}
+      <div class="net-group" data-net-group="{{ $i }}" style="--net-accent: var(--net-c{{ add (mod $i 6) 1 }})">
+        <h3 class="net-cat" tabindex="0">{{ index $g "name" | markdownify | emojify }}</h3>
+        <ul class="net-skills">
+          {{ range index $g "items" }}
+          <li class="net-skill"><span class="net-skill__label">{{ index . "label" | default (index . "name") | markdownify | emojify }}</span></li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+    {{ end }}
+  </div>
+{{ end }}

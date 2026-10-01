@@ -1,0 +1,283 @@
+/* Homepage hero: tighten the gap below the navbar (theme default is up to 128px at xl) */
+#section-resume-biography-3 .resume-biography {
+  padding-top: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  #section-resume-biography-3 .resume-biography {
+    padding-top: 3.5rem;
+  }
+}
+
+/* Smooth in-page scrolling; respects reduced-motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Keep anchored headings clear of the sticky navbar (+16px breathing room).
+   !important is needed because the theme's nav JS sets an inline scroll-padding-top
+   equal to the bare navbar height; --navbar-height is measured by that same script. */
+html {
+  scroll-padding-top: calc(var(--navbar-height, 75px) + 16px) !important;
+}
+
+/* Dark mode: the Minimal pack's light-blue primary-600 gives white button text only ~3:1.
+   Use deeper stops so "Download CV" meets WCAG AA (>= 4.5:1). */
+.dark #section-resume-biography-3 a.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--color-primary-800), var(--color-secondary-700));
+}
+.dark #section-resume-biography-3 a.bg-gradient-to-r:hover {
+  filter: brightness(0.9);
+}
+
+/* Homepage hero: hide the Education section (it's shown in full on the Experience page).
+   Only the Education wrapper contains a .grid; the Download CV wrapper (also .mb-16) does not. */
+#section-resume-biography-3 .md\:col-span-8 > div.mb-16:has(.grid) {
+  display: none;
+}
+
+/* Experience page: education entries have no dates, so hide their date badge
+   (the theme always renders it and falls back to "Present"). Scoped to the
+   education timeline, which is the only one drawn with the secondary colour. */
+.relative:has(> .from-secondary-500) .group div.shrink-0:has(> time) {
+  display: none;
+}
+
+/* ── Experience page: Skills as a card grid with pill tags ─────────────────────
+   Pure CSS over the theme's resume-skills markup: each group (.w-full) becomes a
+   wrapping flex card whose heading spans the full row, so the items flow as pills. */
+#section-resume-skills .grid {
+  max-width: 72rem;
+  padding-inline: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (min-width: 640px) {
+  #section-resume-skills .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  #section-resume-skills .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+#section-resume-skills .grid > .w-full {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--hb-color-foreground) 14%, transparent);
+  border-radius: var(--hb-radius, 0.5rem);
+  background-color: var(--hb-color-header-bg);
+}
+
+/* Group heading: full row, normal case, semibold, primary */
+#section-resume-skills .grid > .w-full > div:first-child {
+  flex-basis: 100%;
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primary-700);
+}
+.dark #section-resume-skills .grid > .w-full > div:first-child {
+  color: var(--color-primary-400);
+}
+
+/* Pills */
+#section-resume-skills .skills-content {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--hb-color-foreground) 18%, transparent);
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--hb-color-foreground) 6%, var(--hb-color-background));
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+#section-resume-skills .skills-name {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--hb-color-foreground);
+}
+#section-resume-skills .skills-content:hover {
+  border-color: color-mix(in srgb, var(--color-primary-500) 60%, transparent);
+  background-color: color-mix(in srgb, var(--color-primary-500) 10%, var(--hb-color-background));
+}
+
+/* ── Experience page: Skills "neural network" (>= 1024px) ──────────────────────
+   Markup: layouts/_partials/hbx/blocks/resume-skills/block.html; edges: assets/js/skills-network.js.
+   Accent colours are only used for borders, underline bars and edges (text stays foreground). */
+#section-resume-skills {
+  --net-c1: #ea580c; /* orange */
+  --net-c2: #16a34a; /* green  */
+  --net-c3: #2563eb; /* blue   */
+  --net-c4: #7c3aed; /* violet */
+  --net-c5: #db2777; /* pink   */
+  --net-c6: #0d9488; /* teal   */
+}
+.dark #section-resume-skills {
+  --net-c1: #fb923c;
+  --net-c2: #4ade80;
+  --net-c3: #60a5fa;
+  --net-c4: #a78bfa;
+  --net-c5: #f472b6;
+  --net-c6: #2dd4bf;
+}
+
+#section-resume-skills .skills-net { display: none; }
+
+@media (min-width: 1024px) {
+  #section-resume-skills .skills-cards { display: none; }
+
+  #section-resume-skills .skills-net {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 5.5rem);
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0.5rem 1.5rem;
+  }
+}
+
+#section-resume-skills .skills-net__edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#section-resume-skills .skills-net__side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+#section-resume-skills .skills-net__side--left { align-items: flex-end; }
+#section-resume-skills .skills-net__side--right { align-items: flex-start; }
+
+#section-resume-skills .net-group {
+  display: flex;
+  align-items: center;
+  gap: clamp(2.25rem, 3.5vw, 3.75rem);
+  transition: opacity 200ms ease;
+}
+/* Left side is mirrored: skills sit to the left of their category */
+#section-resume-skills .skills-net__side--left .net-group { flex-direction: row-reverse; }
+
+#section-resume-skills .net-cat {
+  margin: 0;
+  padding: 0.4rem 0.95rem;
+  border: 2px solid var(--net-accent);
+  border-radius: 9999px;
+  background-color: var(--hb-color-background);
+  color: var(--hb-color-foreground);
+  font-size: 0.95rem;
+  line-height: 1.3;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+#section-resume-skills .net-cat:focus-visible {
+  outline: 2px solid var(--net-accent);
+  outline-offset: 3px;
+}
+
+#section-resume-skills .net-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#section-resume-skills .skills-net__side--left .net-skills { align-items: flex-end; text-align: right; }
+#section-resume-skills .skills-net__side--right .net-skills { align-items: flex-start; }
+
+#section-resume-skills .net-skill {
+  max-width: 15rem;
+  color: var(--hb-color-foreground);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+/* Underline bar sits under the text itself (each line, if a long label wraps) */
+#section-resume-skills .net-skill__label {
+  padding: 0 0.15rem 0.15rem;
+  border-bottom: 2px solid var(--net-accent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (min-width: 1280px) {
+  #section-resume-skills .net-skill { max-width: none; white-space: nowrap; }
+}
+
+#section-resume-skills .net-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.85rem 1.6rem;
+  border: 2px solid var(--color-primary-500);
+  border-radius: 9999px;
+  background-color: var(--hb-color-header-bg);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+}
+#section-resume-skills .net-center__name {
+  color: var(--hb-color-foreground);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 700;
+}
+#section-resume-skills .net-center__sub {
+  color: color-mix(in srgb, var(--hb-color-foreground) 80%, var(--hb-color-header-bg));
+  font-size: 0.8rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+/* Edges */
+#section-resume-skills .net-edges-g { transition: opacity 200ms ease; }
+#section-resume-skills .net-edge {
+  fill: none;
+  stroke-width: 1.5;
+  transition: stroke-width 200ms ease, opacity 200ms ease;
+}
+#section-resume-skills .net-edge--trunk { stroke: color-mix(in srgb, var(--hb-color-foreground) 35%, transparent); }
+#section-resume-skills .net-end--trunk { fill: color-mix(in srgb, var(--hb-color-foreground) 45%, transparent); }
+#section-resume-skills .net-edge--leaf { stroke: var(--net-accent); opacity: 0.8; }
+#section-resume-skills .net-end--leaf { fill: var(--net-accent); }
+#section-resume-skills .net-pulse {
+  fill: var(--net-accent);
+  filter: drop-shadow(0 0 4px var(--net-accent));
+}
+
+/* Hover / focus a category: highlight its branch, dim the rest */
+#section-resume-skills .skills-net.is-focus .net-group:not(.is-active),
+#section-resume-skills .skills-net.is-focus .net-edges-g:not(.is-active) {
+  opacity: 0.35;
+}
+#section-resume-skills .skills-net.is-focus .net-edges-g.is-active .net-edge {
+  stroke-width: 2.25;
+  opacity: 1;
+}
+#section-resume-skills .skills-net.is-focus .net-edges-g.is-active .net-edge--trunk {
+  stroke: color-mix(in srgb, var(--hb-color-foreground) 60%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #section-resume-skills .net-group,
+  #section-resume-skills .net-edges-g,
+  #section-resume-skills .net-edge { transition: none; }
+}

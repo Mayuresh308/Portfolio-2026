@@ -1,0 +1,113 @@
+slug: me
+is_owner: true
+name:
+  display: Mayuresh Devadkar
+  given: Mayuresh
+  family: Devadkar
+role: Applied AI & Software Developer
+bio: |
+  Applied AI and software developer building LLM-powered products, RAG workflows, AI agent
+  evaluation, and workflow automation. I combine product discovery and solution design with
+  hands-on implementation, debugging, and validation.
+
+links:
+  - icon: at-symbol
+    url: mailto:mayureshmayuresh56@gmail.com
+    label: E-mail Me
+  - icon: brands/linkedin
+    url: https://www.linkedin.com/in/mayuresh-devadkar-874403224
+  - icon: brands/github
+    url: https://github.com/Mayuresh308
+
+interests:
+  - LLM Applications
+  - Retrieval-Augmented Generation (RAG)
+  - AI Agent Evaluation
+  - Workflow Automation
+  - Product Discovery
+
+education:
+  - degree: B.E. Mechanical Engineering
+    institution: PDEA College of Engineering, Hadapsar, Pune
+    summary: 'CGPA: 8.02'
+  - degree: Full Stack Web Development (Certification)
+    institution: Coding Ninjas
+    summary: MongoDB, Express.js, React.js, Node.js, Data Structures and Algorithms
+
+experience:
+  - role: Operations Associate (Product & Engineering Operations)
+    org: Seconds
+    start: 2025-12-01
+    end: 2026-09-30
+    summary: |
+      *Remote*
+
+      - Contributed to AI product development across SmartLeads, OneClick, and HoverTime, translating product problems into feature requirements, workflows, prototypes, implementation support, and validation.
+      - Designed and iterated on LangChain/RAG prompt-to-lead workflows: prompt-to-keyword generation, candidate retrieval, contextual relevance comparison, and structured result handling.
+      - Developed relevance-scoring criteria and Tier 1/2/3 qualification logic; prompt iterations improved results from ~2/10 to 7/10 on a manually reviewed test sample (not a production-wide metric).
+      - Evaluated AI agents and LLM features for relevance, accuracy, unsupported content, and edge cases, including meeting summaries, action items, searchable meeting memory, and voice-to-text workflows.
+      - Independently built most internal n8n automations integrating Slack, Google Drive, and Google Sheets (leave management, knowledge lookup, task intake, idea submissions).
+      - Investigated duplicate-event handling; contributed to API/data workflows, product requirements, debugging, beta-feedback tracking, and prompt/output comparisons using exploratory LangSmith traces.
+  - role: Web Developer (React.js)
+    org: Saral Tech
+    start: 2025-01-01
+    end: 2025-12-31
+    summary: |
+      *Remote / Pune*
+
+      - Developed and maintained React.js interfaces for a trading platform and an online course platform, including responsive components, dashboards, course listings, and UI updates.
+      - Maintained a client ticket-booking system and integrated REST APIs to support reliable user workflows.
+  - role: Web Developer (React.js / JavaScript)
+    org: TechSolutions
+    start: 2023-12-01
+    end: 2025-01-31
+    summary: |
+      *Pune*
+
+      - Developed and maintained web applications using JavaScript, React.js, Node.js, and Express.js with responsive HTML/CSS interfaces.
+      - Integrated REST APIs, supported deployments and legacy-application updates, resolved client bugs, and used Git for version control.
+
+skills:
+  - name: AI / LLM
+    items:
+      - label: LLM Applications
+      - label: RAG
+      - label: LangChain
+      - label: Prompt Engineering
+      - label: AI Agents
+      - label: LLM Output Evaluation
+      - label: Gemini Vision
+  - name: Programming
+    items:
+      - label: Python
+      - label: JavaScript (ES6+)
+      - label: TypeScript
+  - name: Web / Backend
+    items:
+      - label: React.js
+      - label: Next.js
+      - label: Node.js
+      - label: Express.js
+      - label: REST APIs
+  - name: Automation
+    items:
+      - label: n8n
+      - label: Slack / Google Workspace integrations
+  - name: Data
+    items:
+      - label: MongoDB
+      - label: MySQL
+  - name: Testing & Tools
+    items:
+      - label: LLM Evaluation & Edge-Case Testing
+      - label: LangSmith
+      - label: Git / GitHub
+      - label: Postman
+      - label: Chrome DevTools
+      - label: Figma
+      - label: Vercel
+      - label: Supabase
+      - label: Claude Code
+
+languages:
+  - name: English

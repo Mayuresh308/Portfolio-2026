@@ -1,0 +1,25 @@
+{
+  "name": "mayuresh-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Mayuresh Devadkar",
+  "homepage": "https://github.com/Mayuresh308/portfolio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mayuresh308/portfolio.git"
+  },
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "hugo server --disableFastRender",
+    "build": "hugo --minify"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.12",
+    "@tailwindcss/typography": "^0.5.10",
+    "preact": "^10.27.2",
+    "tailwindcss": "^4.1.12"
+  }
+}

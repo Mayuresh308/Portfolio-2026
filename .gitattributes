@@ -1,0 +1,2 @@
+# Shell scripts run on Vercel (Linux): always LF
+*.sh text eol=lf
