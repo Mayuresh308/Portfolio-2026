@@ -242,11 +242,37 @@
     return { el: bubble, body: body };
   }
 
-  // 👍/👎 under a completed answer. Fails silently; the rating is remembered with the conversation.
+  function mailtoFor(question) {
+    var subject = "Question from your portfolio";
+    var body = question + "\n\n"; // the visitor's question, then a blank line for their own message
+    return "mailto:" + email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  }
+
+  // Actions under a completed answer: "✉️ Email Mayuresh about this" when the backend said it couldn't
+  // answer (X-Answered: false), then 👍/👎. Feedback fails silently; the rating is remembered.
   function addFeedback(bubbleEl, msg) {
-    if (typeof msg.index !== "number" || msg.index > MAX_MESSAGE_INDEX) return;
+    var canRate = typeof msg.index === "number" && msg.index <= MAX_MESSAGE_INDEX;
+    var canEmail = msg.answered === false && !!email && typeof msg.question === "string";
+    if (!canRate && !canEmail) return;
     var bar = document.createElement("div");
     bar.className = "mchat-fb";
+
+    if (canEmail) {
+      var mail = document.createElement("a");
+      mail.className = "mchat-chip mchat-mail";
+      mail.href = mailtoFor(msg.question);
+      var mailIcon = document.createElement("span");
+      mailIcon.setAttribute("aria-hidden", "true");
+      mailIcon.textContent = "✉️";
+      mail.appendChild(mailIcon);
+      mail.appendChild(document.createTextNode(" Email Mayuresh about this"));
+      bar.appendChild(mail);
+    }
+    if (!canRate) {
+      log.insertBefore(bar, bubbleEl.nextSibling);
+      return;
+    }
+
     var thanks = document.createElement("span");
     thanks.className = "mchat-fb-thanks";
     thanks.textContent = "Thanks";
@@ -449,6 +475,8 @@
         return;
       }
 
+      // The backend sends X-Answered: false when the question isn't covered; offer an email button then.
+      var notAnswered = res.headers.get("x-answered") === "false";
       var reader = res.body.getReader();
       var decoder = new TextDecoder();
       try {
@@ -459,7 +487,12 @@
           if (!piece) continue;
           if (!answer) {
             clearTimeout(timer);
-            messages.push({ role: "assistant", content: "", index: replyIndex });
+            var replyEntry = { role: "assistant", content: "", index: replyIndex };
+            if (notAnswered) {
+              replyEntry.answered = false;
+              replyEntry.question = text; // for the email button's prefilled body
+            }
+            messages.push(replyEntry);
           }
           var stick = nearBottom();
           answer += piece;
@@ -487,7 +520,7 @@
         replyMsg.done = true;
         var stickEnd = nearBottom();
         addFeedback(reply.el, replyMsg);
-        if (stickEnd) scrollToBottom(); // keep the new 👍/👎 row in view
+        if (stickEnd) scrollToBottom(); // keep the new action row in view
       }
       saveMessages();
     } finally {
