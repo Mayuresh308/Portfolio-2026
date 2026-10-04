@@ -281,3 +281,42 @@ html {
   #section-resume-skills .net-edges-g,
   #section-resume-skills .net-edge { transition: none; }
 }
+
+/* ── Homepage hero portrait (override: layouts/_partials/hbx/blocks/resume-biography-3/block.html) ── */
+.avatar-wrapper.avatar-portrait {
+  width: 280px;
+  max-width: 100%;
+}
+
+.avatar-portrait img.avatar {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 16px;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.avatar-portrait:hover img.avatar {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 64px -12px rgb(0 0 0 / 0.35);
+}
+
+@media (max-width: 639.98px) {
+  .avatar-wrapper.avatar-portrait {
+    width: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-portrait img.avatar {
+    transition: none;
+  }
+
+  .avatar-portrait:hover img.avatar {
+    transform: none;
+  }
+}
