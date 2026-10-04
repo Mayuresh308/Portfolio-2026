@@ -1,0 +1,60 @@
+{{/* "Ask about Mayuresh" chat widget. Loaded on every page via the theme's body-end hook.
+     Config: params.yaml → chat.{enable, endpoint, contact_email}. Behaviour lives in assets/js/chat-widget.js. */}}
+{{- $chat := site.Params.chat | default dict -}}
+{{- if and $chat.endpoint (ne $chat.enable false) -}}
+{{- $css := resources.Get "css/chat-widget.css" | resources.Minify | fingerprint "sha256" -}}
+{{- $js := resources.Get "js/chat-widget.js" | resources.Minify | fingerprint "sha256" -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+<div class="mchat" id="mchat" hidden
+     data-endpoint="{{ $chat.endpoint }}"
+     data-email="{{ $chat.contact_email | default "" }}">
+  <button type="button" class="mchat-fab" id="mchat-fab"
+          aria-label="Ask about Mayuresh" aria-expanded="false" aria-controls="mchat-panel">
+    <svg class="mchat-icon mchat-icon-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6A.5.5 0 0 1 5 19.2V16h-.5A2.5 2.5 0 0 1 2 13.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="8.5" cy="9.5" r="1.1" fill="currentColor"/><circle cx="12" cy="9.5" r="1.1" fill="currentColor"/><circle cx="15.5" cy="9.5" r="1.1" fill="currentColor"/>
+    </svg>
+    <svg class="mchat-icon mchat-icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="mchat-tooltip" aria-hidden="true">Ask about Mayuresh</span>
+  </button>
+
+  <section class="mchat-panel" id="mchat-panel" role="dialog" aria-modal="false" aria-labelledby="mchat-title" hidden>
+    <header class="mchat-header">
+      <h2 class="mchat-title" id="mchat-title">Ask about Mayuresh</h2>
+      <button type="button" class="mchat-clear" id="mchat-clear" hidden>Clear chat</button>
+      <button type="button" class="mchat-close" id="mchat-close" aria-label="Close chat">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <p class="mchat-note">Ask anything about Mayuresh's work, answered by AI from his experience.<br>Questions may be saved to improve answers.</p>
+
+    <div class="mchat-scroll" id="mchat-scroll">
+      <div class="mchat-empty" id="mchat-empty">
+        <p>Ask about his experience, skills, projects, or availability.</p>
+        <div class="mchat-chips" role="group" aria-label="Suggested questions">
+          <button type="button" class="mchat-chip">What did he do at his previous company?</button>
+          <button type="button" class="mchat-chip">Does he know RAG?</button>
+          <button type="button" class="mchat-chip">Is he open to remote roles?</button>
+        </div>
+      </div>
+      <div class="mchat-log" id="mchat-log" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation"></div>
+    </div>
+
+    <form class="mchat-form" id="mchat-form" novalidate>
+      <label class="mchat-sr" for="mchat-input">Your question</label>
+      <textarea class="mchat-input" id="mchat-input" rows="1" maxlength="600"
+                placeholder="Ask a question…" aria-describedby="mchat-hint mchat-count" autocomplete="off"></textarea>
+      <button type="submit" class="mchat-send" id="mchat-send" aria-label="Send">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12l16-8-6 16-2.5-6.5L4 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="mchat-meta">
+        <span class="mchat-sr" id="mchat-hint">Enter sends, Shift+Enter adds a new line.</span>
+        <span class="mchat-count" id="mchat-count" hidden></span>
+      </p>
+    </form>
+  </section>
+</div>
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end -}}

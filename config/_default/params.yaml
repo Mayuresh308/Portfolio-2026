@@ -263,3 +263,15 @@ hugoblox:
       position: bottom-left # top-left | top-right | bottom-left | bottom-right
       opacity: 1.0
     export_logs: true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CHAT WIDGET ("Ask about Mayuresh")
+# Injected on every page by layouts/_partials/hooks/body-end/chat-widget.html.
+# The endpoint must list this site's origin in the backend's ALLOWED_ORIGINS.
+# Override locally without editing this file, e.g.:
+#   HUGO_PARAMS_CHAT_ENDPOINT=http://localhost:3000/api/chat pnpm dev
+# ──────────────────────────────────────────────────────────────────────────────
+chat:
+  enable: true
+  endpoint: "https://portfolio-backend-five-iota-75.vercel.app/api/chat"
+  contact_email: "mayureshmayuresh56@gmail.com"

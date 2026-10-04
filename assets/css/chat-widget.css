@@ -1,0 +1,539 @@
+/* "Ask about Mayuresh" chat widget.
+   Colours come from the theme's tokens, so light/dark mode follows the site automatically.
+   Contrast (light / dark): accent on background 5.9:1 / 7.6:1, muted text on surfaces >= 5.6:1. */
+
+.mchat {
+  --mc-bg: var(--hb-color-background, #ffffff);
+  --mc-fg: var(--hb-color-foreground, #24292f);
+  --mc-surface: var(--hb-color-header-bg, #f6f8fa);
+  --mc-muted: var(--hb-color-footer-fg, #57606a);
+  --mc-accent: var(--color-primary-600, #085ec4);
+  --mc-on-accent: #ffffff;
+  --mc-border: color-mix(in srgb, var(--mc-fg) 18%, transparent);
+  --mc-radius: var(--hb-radius, 0.5rem);
+  --mc-font: var(--hb-font-body, system-ui, sans-serif);
+  --mc-z: 60;
+  font-family: var(--mc-font);
+  color: var(--mc-fg);
+}
+
+.dark .mchat {
+  --mc-accent: var(--color-primary-500, #58a6ff);
+  --mc-on-accent: var(--hb-color-background, #0d1117);
+}
+
+.mchat [hidden],
+.mchat[hidden] {
+  display: none !important;
+}
+
+.mchat button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.mchat :focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: 2px;
+}
+
+.mchat-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Floating button ─────────────────────────────────────────────────────── */
+
+.mchat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: var(--mc-z);
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mc-accent);
+  color: var(--mc-on-accent);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mchat-fab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.28);
+}
+
+.mchat-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.mchat-icon-close,
+.mchat.is-open .mchat-icon-open {
+  display: none;
+}
+
+.mchat.is-open .mchat-icon-close {
+  display: block;
+}
+
+.mchat-tooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  border-radius: var(--mc-radius);
+  background: var(--mc-fg);
+  color: var(--mc-bg);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.mchat-fab:hover .mchat-tooltip,
+.mchat-fab:focus-visible .mchat-tooltip {
+  opacity: 1;
+}
+
+.mchat.is-open .mchat-tooltip {
+  display: none;
+}
+
+/* ── Panel ───────────────────────────────────────────────────────────────── */
+
+.mchat-panel {
+  position: fixed;
+  right: 20px;
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 68px);
+  z-index: var(--mc-z);
+  width: 380px;
+  height: 560px;
+  max-height: calc(100dvh - 112px);
+  display: flex;
+  flex-direction: column;
+  background: var(--mc-bg);
+  color: var(--mc-fg);
+  border: 1px solid var(--mc-border);
+  border-radius: calc(var(--mc-radius) * 1.5);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+  animation: mchat-in 0.16s ease-out;
+}
+
+@keyframes mchat-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mchat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px 16px;
+  background: var(--mc-surface);
+  border-bottom: 1px solid var(--mc-border);
+}
+
+.mchat-title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--hb-font-heading, var(--mc-font));
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--mc-fg);
+}
+
+.mchat-clear {
+  padding: 4px 8px;
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-radius);
+  background: transparent;
+  color: var(--mc-fg);
+  font-size: 0.8125rem;
+}
+
+.mchat-clear:hover {
+  background: var(--mc-bg);
+}
+
+.mchat-clear:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.mchat-close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--mc-radius);
+  background: transparent;
+  color: var(--mc-fg);
+}
+
+.mchat-close:hover {
+  background: var(--mc-bg);
+}
+
+.mchat-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mchat-note {
+  margin: 0;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--mc-muted);
+  background: var(--mc-surface);
+  border-bottom: 1px solid var(--mc-border);
+}
+
+/* ── Messages ────────────────────────────────────────────────────────────── */
+
+.mchat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+}
+
+.mchat-empty p {
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+  color: var(--mc-muted);
+}
+
+.mchat-chips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.mchat-chip {
+  padding: 8px 12px;
+  border: 1px solid var(--mc-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mc-accent);
+  font-size: 0.875rem;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.mchat-chip:hover {
+  background: var(--mc-surface);
+}
+
+.mchat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mchat-msg {
+  max-width: 88%;
+  padding: 9px 12px;
+  border-radius: calc(var(--mc-radius) * 1.5);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.mchat-msg-user {
+  align-self: flex-end;
+  background: var(--mc-accent);
+  color: var(--mc-on-accent);
+  border-bottom-right-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.mchat-msg-assistant {
+  align-self: flex-start;
+  background: var(--mc-surface);
+  color: var(--mc-fg);
+  border: 1px solid var(--mc-border);
+  border-bottom-left-radius: 4px;
+}
+
+.mchat-msg-error {
+  align-self: flex-start;
+  background: var(--mc-bg);
+  color: var(--mc-fg);
+  border: 1px dashed color-mix(in srgb, var(--mc-fg) 45%, transparent);
+}
+
+.mchat-msg p {
+  margin: 0;
+}
+
+.mchat-msg p + p,
+.mchat-msg p + ul,
+.mchat-msg p + ol,
+.mchat-msg ul + p,
+.mchat-msg ol + p {
+  margin-top: 0.5em;
+}
+
+.mchat-msg ul,
+.mchat-msg ol {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+.mchat-msg ul {
+  list-style: disc;
+}
+
+.mchat-msg ol {
+  list-style: decimal;
+}
+
+.mchat-msg li + li {
+  margin-top: 0.25em;
+}
+
+.mchat-msg strong {
+  font-weight: 600;
+}
+
+.mchat-msg a {
+  color: var(--mc-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.mchat-msg-user a {
+  color: inherit;
+}
+
+/* Typing indicator, shown until the first chunk arrives. */
+.mchat-typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.mchat-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mc-muted);
+  animation: mchat-dot 1.2s infinite ease-in-out;
+}
+
+.mchat-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.mchat-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes mchat-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: none;
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ── Composer ────────────────────────────────────────────────────────────── */
+
+.mchat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 4px 8px;
+  padding: 10px 12px 8px;
+  border-top: 1px solid var(--mc-border);
+  background: var(--mc-bg);
+}
+
+.mchat-input {
+  width: 100%;
+  min-height: 42px;
+  max-height: 140px;
+  padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--mc-fg) 35%, transparent);
+  border-radius: var(--mc-radius);
+  background: var(--mc-bg);
+  color: var(--mc-fg);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  resize: none;
+}
+
+.mchat-input::placeholder {
+  color: var(--mc-muted);
+  opacity: 1;
+}
+
+.mchat-input:focus-visible {
+  outline-offset: 0;
+}
+
+.mchat-send {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--mc-radius);
+  background: var(--mc-accent);
+  color: var(--mc-on-accent);
+}
+
+.mchat-send svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mchat-send:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mchat-meta {
+  grid-column: 1 / -1;
+  min-height: 1em;
+  margin: 0;
+  text-align: right;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--mc-muted);
+}
+
+.mchat-count.is-max {
+  color: var(--mc-fg);
+  font-weight: 600;
+}
+
+/* ── Small screens: full-screen panel ────────────────────────────────────── */
+
+@media (max-width: 639.98px) {
+  .mchat-panel {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mchat.is-open .mchat-fab {
+    display: none;
+  }
+
+  .mchat-msg {
+    max-width: 92%;
+  }
+}
+
+html.mchat-lock,
+html.mchat-lock body {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mchat-panel {
+    animation: none;
+  }
+
+  .mchat-fab,
+  .mchat-tooltip {
+    transition: none;
+  }
+
+  .mchat-fab:hover {
+    transform: none;
+  }
+
+  .mchat-typing span {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* ── Answer feedback (👍/👎) ─────────────────────────────────────────────── */
+
+.mchat-fb {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: -4px;
+  font-size: 0.75rem;
+  color: var(--mc-muted);
+}
+
+.mchat-fb-btn {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--mc-radius);
+  background: transparent;
+  font-size: 0.875rem;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+
+.mchat-fb-btn:hover:not(:disabled),
+.mchat-fb-btn:focus-visible {
+  border-color: var(--mc-border);
+  filter: none;
+  opacity: 1;
+}
+
+.mchat-fb-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.mchat-fb-btn[aria-pressed="true"] {
+  filter: none;
+  opacity: 1;
+  border-color: var(--mc-border);
+}
+
+.mchat-fb-thanks {
+  margin-left: 2px;
+  color: var(--mc-muted);
+}
+
+.mchat-fb-thanks:focus {
+  outline: none;
+}
