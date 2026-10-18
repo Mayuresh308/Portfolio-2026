@@ -47,7 +47,7 @@ sections:
       text: |-
         I studied Mechanical Engineering, then moved into building software.
         As an Operations Associate, I own products end to end, from development and testing to UI/UX and debugging.
-        Today I'm building AI products, including tools for meetings and speech-to-text.
+        Currently building a voice-controlled PC assistant and a multimodal Reel analyzer.
         I'm looking for product and AI roles where I can take ideas from problem to shipped product.
     design:
       columns: '1'
