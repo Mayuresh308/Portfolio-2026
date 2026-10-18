@@ -12,6 +12,9 @@ sections:
       filters:
         folders:
           - projects
+      # Order by front-matter weight (1 = first), not by date.
+      sort_by: Weight
+      sort_ascending: true
     design:
       view: article-grid
       fill_image: false

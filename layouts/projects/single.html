@@ -1,0 +1,123 @@
+{{/* Case-study layout for project pages (content/projects/*). Other sections keep the theme's single.html.
+     Front matter: summary, status, role, timeline, context, stack (list), tags, banner_caption.
+     Bundle images: featured.(png|jpg) = full-bleed banner; optional featured-mobile.(png|jpg) for <768px.
+     Styles: assets/css/case-study.css. H2 eyebrows and scrollable tables: layouts/projects/_markup/. */}}
+{{ define "main" }}
+{{- $css := resources.Get "css/case-study.css" | resources.Minify | fingerprint "sha256" -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+
+{{- /* Exact "featured.*" first: the theme's "*featured*" lookup would also match featured-mobile.* (it sorts first). */}}
+{{- $banner := (.Resources.ByType "image").GetMatch "featured.*" }}
+{{- if not $banner }}{{ $banner = partial "functions/get_featured_image.html" . }}{{ end }}
+{{- $canProcess := and $banner (reflect.IsImageResourceProcessable $banner) (ne $banner.MediaType.SubType "gif") }}
+{{- $bannerMobile := .Resources.GetMatch "featured-mobile.*" }}
+{{- $blur := "" }}
+
+<article class="cs-page" data-pagefind-body>
+  {{- with $banner }}
+    {{- $alt := printf "%s banner" $.Title }}
+    {{- if $canProcess }}
+      {{- /* Responsive widths, never above the source width (no upscaling). */}}
+      {{- $img := . }}
+      {{- $widths := slice }}
+      {{- range slice 768 1280 1920 }}{{ if lt . $img.Width }}{{ $widths = $widths | append . }}{{ end }}{{ end }}
+      {{- $widths = $widths | append $img.Width }}
+      {{- $webp := slice }}
+      {{- $jpg := slice }}
+      {{- $fallback := $img }}
+      {{- range $widths }}
+        {{- $w := $img.Resize (printf "%dx webp q82" .) }}
+        {{- $webp = $webp | append (printf "%s %dw" $w.RelPermalink $w.Width) }}
+        {{- $j := $img.Resize (printf "%dx jpg q82" .) }}
+        {{- $jpg = $jpg | append (printf "%s %dw" $j.RelPermalink $j.Width) }}
+        {{- $fallback = $j }}
+      {{- end }}
+      {{- $blur = ($img.Resize "480x webp q60").RelPermalink }}
+      {{- /* Measure the sticky header so the desktop banner fits the first screen (falls back to 76px without JS). */}}
+      <script>(function(){var h=document.querySelector(".page-header");function s(){if(h)document.documentElement.style.setProperty("--cs-header-h",h.offsetHeight+"px")}s();addEventListener("resize",s)})();</script>
+      <div class="cs-banner" style="--cs-banner-w: {{ $img.Width }}px; --cs-banner-ratio: {{ div (float $img.Height) $img.Width }}; --cs-blur: url('{{ $blur }}');">
+        <picture>
+          {{- with $bannerMobile }}
+            {{- if and (reflect.IsImageResourceProcessable .) (ne .MediaType.SubType "gif") }}
+            {{- $mw := cond (lt .Width 1280) .Width 1280 }}
+            <source media="(max-width: 767px)" type="image/webp" srcset="{{ (.Resize (printf "%dx webp q82" $mw)).RelPermalink }}">
+            <source media="(max-width: 767px)" srcset="{{ (.Resize (printf "%dx jpg q82" $mw)).RelPermalink }}">
+            {{- end }}
+          {{- end }}
+          <source type="image/webp" srcset="{{ delimit $webp ", " }}" sizes="100vw">
+          <img class="cs-banner-img" src="{{ $fallback.RelPermalink }}" srcset="{{ delimit $jpg ", " }}" sizes="100vw"
+               width="{{ $img.Width }}" height="{{ $img.Height }}" alt="{{ $alt }}"
+               loading="eager" fetchpriority="high" decoding="async" data-pagefind-meta="image[src]">
+        </picture>
+      </div>
+    {{- else }}
+      <div class="cs-banner">
+        <img class="cs-banner-img" src="{{ .RelPermalink }}" alt="{{ $alt }}" loading="eager" fetchpriority="high">
+      </div>
+    {{- end }}
+  {{- end }}
+
+  <div class="cs-top{{ if $blur }} cs-top--blur{{ end }}"{{ with $blur }} style="--cs-blur: url('{{ . }}');"{{ end }}>
+    <div class="cs">
+      {{- if $banner }}{{ with .Params.banner_caption }}
+      <p class="cs-banner-caption">{{ . }}</p>
+      {{- end }}{{ end }}
+
+      <header class="cs-hero">
+        <h1 class="cs-title" data-pagefind-meta="title">{{ .Title }}</h1>
+        {{- with .Params.summary }}
+        <p class="cs-lead">{{ . | markdownify }}</p>
+        {{- end }}
+        {{- with .Params.status }}
+        <p class="cs-status"><span class="cs-status-dot" aria-hidden="true"></span>{{ . }}</p>
+        {{- end }}
+      </header>
+
+      {{- $p := .Params }}
+      {{- if or $p.role $p.timeline $p.context $p.stack }}
+      <section class="cs-glance" aria-label="At a glance">
+        <dl class="cs-glance-grid">
+          {{- with $p.role }}<div class="cs-card"><dt>Role</dt><dd>{{ . }}</dd></div>{{ end }}
+          {{- with $p.timeline }}<div class="cs-card"><dt>Timeline</dt><dd>{{ . }}</dd></div>{{ end }}
+          {{- with $p.context }}<div class="cs-card"><dt>Context</dt><dd>{{ . }}</dd></div>{{ end }}
+          {{- with $p.stack }}
+          <div class="cs-card">
+            <dt>Stack</dt>
+            <dd><ul class="cs-chips">{{ range . }}<li class="cs-chip">{{ . }}</li>{{ end }}</ul></dd>
+          </div>
+          {{- end }}
+        </dl>
+      </section>
+      {{- end }}
+    </div>
+  </div>
+
+  <div class="cs cs-main">
+    <div class="cs-body prose prose-slate dark:prose-invert">
+      {{ .Content }}
+    </div>
+
+    <footer class="cs-footer">
+      {{- with .GetTerms "tags" }}
+      <ul class="cs-chips cs-tags" aria-label="Tags">
+        {{- range . }}<li><a class="cs-chip cs-chip-link" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+      </ul>
+      {{- end }}
+
+      {{- /* Next project by weight within the projects section (pages without a weight come last). */}}
+      {{- $next := false }}
+      {{- $found := false }}
+      {{- range (where site.RegularPages "Section" "projects").ByWeight }}
+        {{- if and $found (not $next) }}{{ $next = . }}{{ end }}
+        {{- if eq .RelPermalink $.RelPermalink }}{{ $found = true }}{{ end }}
+      {{- end }}
+      <nav class="cs-nav" aria-label="Project navigation">
+        <a class="cs-nav-link" href="{{ with site.GetPage "/projects" }}{{ .RelPermalink }}{{ else }}{{ "projects/" | relURL }}{{ end }}">← All projects</a>
+        {{- with $next }}
+        <a class="cs-nav-link cs-nav-next" href="{{ .RelPermalink }}"><span class="cs-nav-hint">Next project →</span><span class="cs-nav-title">{{ .LinkTitle }}</span></a>
+        {{- end }}
+      </nav>
+    </footer>
+  </div>
+</article>
+{{ end }}

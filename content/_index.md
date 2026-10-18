@@ -59,6 +59,9 @@ sections:
         folders:
           - projects
         featured_only: true
+      # Order by front-matter weight (1 = first), not by date.
+      sort_by: Weight
+      sort_ascending: true
     design:
       view: article-grid
       columns: 2

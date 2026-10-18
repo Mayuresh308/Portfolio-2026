@@ -1,0 +1,23 @@
+{{- /* Project pages only: tables scroll horizontally inside their own container on narrow screens. */ -}}
+<div class="cs-scroll" role="region" aria-label="Table" tabindex="0">
+<table{{ range $k, $v := .Attributes }} {{ $k }}="{{ $v }}"{{ end }}>
+  <thead>
+    {{- range .THead }}
+    <tr>
+      {{- range . }}
+      <th{{ with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</th>
+      {{- end }}
+    </tr>
+    {{- end }}
+  </thead>
+  <tbody>
+    {{- range .TBody }}
+    <tr>
+      {{- range . }}
+      <td{{ with .Alignment }} style="text-align: {{ . }}"{{ end }}>{{ .Text }}</td>
+      {{- end }}
+    </tr>
+    {{- end }}
+  </tbody>
+</table>
+</div>

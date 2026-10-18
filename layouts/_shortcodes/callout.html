@@ -1,0 +1,16 @@
+{{- /* Highlighted box for key insights. Replaces the theme's deprecated `callout` (which logs a build warning).
+       Usage:
+         {{< callout title="Key insight" >}}
+         Markdown **content**.
+         {{< /callout >}}
+       Styles: .cs-callout in assets/css/custom.css (works on any page). */ -}}
+{{- $title := "" -}}
+{{- if .IsNamedParams }}{{ $title = .Get "title" }}{{ end -}}
+<aside class="cs-callout" role="note"{{ with $title }} aria-label="{{ . }}"{{ end }}>
+  {{- with $title }}
+  <p class="cs-callout-title">{{ . }}</p>
+  {{- end }}
+  <div class="cs-callout-body">
+    {{ .Inner | .Page.RenderString (dict "display" "block") }}
+  </div>
+</aside>

@@ -1,0 +1,36 @@
+{{- /* LOCAL OVERRIDE of the theme's article-grid card (used only by the Projects listings on the homepage and
+       /projects/): compact, image-led card. One stretched link per card; its accessible name is the title.
+       Styles: .pc in assets/css/custom.css. Grid wrapper: views/article-grid--start.html / --end.html. */ -}}
+{{- $item := .item -}}
+{{- $link := $item.RelPermalink -}}
+{{- $external := false -}}
+{{- with $item.Params.external_link }}{{ $link = . }}{{ $external = true }}{{ end -}}
+{{- $image := (($item.Resources.ByType "image").GetMatch "featured.*") -}}
+{{- if not $image }}{{ $image = partial "functions/get_featured_image.html" $item }}{{ end -}}
+<article class="pc">
+  <div class="pc-media">
+    {{- with $image }}
+      {{- if and (reflect.IsImageResourceProcessable .) (ne .MediaType.SubType "gif") }}
+        {{- /* 16:9, anchored left (banner titles sit on the left). Fill never exceeds the source size. */}}
+        {{- $sm := .Fill "560x315 Left webp q82" }}
+        {{- $lg := .Fill "1120x630 Left webp q82" }}
+        <img src="{{ $sm.RelPermalink }}" srcset="{{ $sm.RelPermalink }} {{ $sm.Width }}w, {{ $lg.RelPermalink }} {{ $lg.Width }}w"
+             sizes="(min-width: 768px) 540px, 100vw" width="{{ $sm.Width }}" height="{{ $sm.Height }}"
+             alt="" loading="{{ if eq $.index 0 }}eager{{ else }}lazy{{ end }}" decoding="async">
+      {{- else }}
+        <img src="{{ .RelPermalink }}" alt="" loading="lazy" decoding="async">
+      {{- end }}
+    {{- else }}
+      <span class="pc-placeholder" aria-hidden="true"></span>
+    {{- end }}
+  </div>
+  <div class="pc-body">
+    <h3 class="pc-title">
+      <a class="pc-link" href="{{ $link }}"{{ if $external }} target="_blank" rel="noopener"{{ end }}>{{ $item.Title }}</a>
+    </h3>
+    {{- with partial "functions/get_summary" $item }}
+    <p class="pc-summary">{{ . | plainify | htmlUnescape }}</p>
+    {{- end }}
+    <span class="pc-cta" aria-hidden="true">View project →</span>
+  </div>
+</article>

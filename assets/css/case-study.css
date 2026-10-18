@@ -1,0 +1,402 @@
+/* Case-study layout for project pages (layouts/projects/single.html).
+   Colours come from the theme's tokens. Contrast (light / dark): muted text on page and card ≥ 5.6:1,
+   accent text ≥ 5.5:1. */
+
+.cs-page {
+  --cs-bg: var(--hb-color-background, #ffffff);
+  --cs-fg: var(--hb-color-foreground, #24292f);
+  --cs-surface: var(--hb-color-header-bg, #f6f8fa);
+  --cs-muted: var(--hb-color-footer-fg, #57606a);
+  --cs-border: color-mix(in srgb, var(--cs-fg) 16%, transparent);
+  --cs-accent: var(--color-primary-600, #085ec4);
+  --cs-accent-rgb: var(--hb-primary-600-rgb, 8 94 196);
+  color: var(--cs-fg);
+  overflow-wrap: break-word;
+}
+
+.dark .cs-page {
+  --cs-accent: var(--color-primary-500, #58a6ff);
+  --cs-accent-rgb: var(--hb-primary-500-rgb, 88 166 255);
+}
+
+.cs {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+@media (min-width: 640px) {
+  .cs {
+    padding: 2.5rem 1.5rem 5rem;
+  }
+}
+
+.cs-page :focus-visible {
+  outline: 2px solid var(--cs-accent);
+  outline-offset: 3px;
+}
+
+/* ── Full-bleed banner ────────────────────────────────────────────────────── */
+
+/* The banner sits directly under the sticky header. */
+.page-body:has(.cs-banner) {
+  margin-top: 0;
+}
+
+.cs-banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  container-type: inline-size;
+  width: 100%;
+  background: #0b0f15;
+}
+
+/* On screens wider than the source image, a blurred copy fills the sides instead of upscaling. */
+.cs-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cs-blur) center / cover no-repeat;
+  filter: blur(40px) saturate(1.2);
+  transform: scale(1.1);
+}
+
+.cs-banner picture {
+  display: block;
+}
+
+/* Mobile: the whole banner at its natural aspect ratio. */
+.cs-banner-img {
+  display: block;
+  width: 100%;
+  max-width: var(--cs-banner-w, 100%);
+  height: auto;
+  margin: 0 auto;
+}
+
+/* >=768px: fill the first screen below the header, but never taller than the image's natural height and never
+   cropped by more than 10% top and bottom (the banner's logo and headline sit left, between ~12% and ~87%). */
+@media (min-width: 768px) {
+  .cs-banner-img {
+    --cs-natural-h: calc(min(100cqw, var(--cs-banner-w, 100cqw)) * var(--cs-banner-ratio, 0.5));
+    height: clamp(calc(var(--cs-natural-h) * 0.8), calc(100svh - var(--cs-header-h, 76px)), var(--cs-natural-h));
+    object-fit: cover;
+    object-position: left center;
+  }
+}
+
+.cs-banner-caption {
+  margin: 0 0 1.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--cs-muted);
+}
+
+/* ── Title section on a blurred copy of the banner ────────────────────────── */
+
+.cs-top {
+  position: relative;
+  isolation: isolate;
+}
+
+.cs-top--blur {
+  overflow: hidden;
+}
+
+.cs-top--blur::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--cs-blur) center / cover no-repeat;
+  filter: blur(40px) saturate(1.2);
+  transform: scale(1.1);
+}
+
+/* Overlay keeps text at WCAG AA and fades into the page background (no hard edge). */
+.cs-top--blur::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0.9) 55%, var(--cs-bg) 100%);
+}
+
+.dark .cs-top--blur::after {
+  background: linear-gradient(to bottom, rgb(10 12 18 / 0.8) 0%, rgb(10 12 18 / 0.8) 55%, var(--cs-bg) 100%);
+}
+
+.cs-top .cs {
+  padding-bottom: 3rem;
+}
+
+.cs-main {
+  padding-top: 0;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+
+.cs-title {
+  margin: 0;
+  font-family: var(--hb-font-heading, inherit);
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--cs-fg);
+}
+
+.cs-lead {
+  max-width: 52rem;
+  margin: 1rem 0 0;
+  font-size: clamp(1.125rem, 2.4vw, 1.375rem);
+  line-height: 1.55;
+  color: var(--cs-muted);
+}
+
+.cs-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid rgb(var(--cs-accent-rgb) / 0.35);
+  border-radius: 999px;
+  /* Opaque tint, so the blurred banner behind it can't lower the contrast. */
+  background: color-mix(in srgb, rgb(var(--cs-accent-rgb)) 10%, var(--cs-bg));
+  color: var(--cs-accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cs-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── At a glance ──────────────────────────────────────────────────────────── */
+
+.cs-glance {
+  margin-top: 2.5rem;
+}
+
+.cs-glance-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .cs-glance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cs-glance-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cs-card {
+  min-width: 0;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--cs-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cs-surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.cs-card dt {
+  margin: 0 0 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cs-muted);
+}
+
+.cs-card dd {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--cs-fg);
+}
+
+.cs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-chip {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid var(--cs-border);
+  border-radius: 999px;
+  background: var(--cs-bg);
+  color: var(--cs-fg);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.cs-chip-link {
+  text-decoration: none;
+}
+
+.cs-chip-link:hover {
+  border-color: var(--cs-accent);
+  color: var(--cs-accent);
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+
+.cs-body,
+.cs-body.prose {
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+  font-size: 18px;
+  line-height: 1.7;
+  counter-reset: cs-section;
+}
+
+.cs-body > :first-child {
+  margin-top: 0;
+}
+
+/* Numbered eyebrow above each H2 ("01 · Context"), from layouts/projects/_markup/render-heading.html. */
+.cs-body .cs-eyebrow {
+  counter-increment: cs-section;
+  margin: 3.25rem 0 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cs-accent);
+}
+
+.cs-body .cs-eyebrow::before {
+  content: counter(cs-section, decimal-leading-zero) " · ";
+}
+
+.cs-body > .cs-eyebrow:first-child {
+  margin-top: 0;
+}
+
+.cs-body .cs-eyebrow + h2 {
+  margin-top: 0;
+}
+
+.cs-body h2 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+}
+
+/* Tables and Mermaid diagrams scroll inside their own box instead of widening the page. */
+.cs-body .cs-scroll {
+  margin: 1.75rem 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cs-body .cs-scroll table {
+  min-width: 480px;
+  margin: 0;
+}
+
+.cs-body .mermaid {
+  margin: 2rem 0;
+  padding: 0.25rem 0;
+  overflow-x: auto;
+}
+
+.cs-body .mermaid svg {
+  min-width: 640px;
+  height: auto;
+}
+
+.cs-body pre {
+  overflow-x: auto;
+}
+
+/* Typography plugin wraps inline code in literal backticks; show just the code chip. */
+.cs-body :not(pre) > code::before,
+.cs-body :not(pre) > code::after {
+  content: none;
+}
+
+/* Body images: full column width, rounded; captions via the {{< figure >}} shortcode. */
+.cs-body img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.cs-body figure {
+  margin: 2rem 0;
+}
+
+.cs-body figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--cs-muted);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.cs-footer {
+  max-width: 720px;
+  margin: 4rem auto 0;
+  padding-top: 2rem;
+  border-top: 1px solid var(--cs-border);
+}
+
+.cs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.cs-tags + .cs-nav {
+  margin-top: 1.75rem;
+}
+
+.cs-nav-link {
+  color: var(--cs-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cs-nav-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cs-nav-next {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  text-align: right;
+}
+
+.cs-nav-hint {
+  font-size: 0.875rem;
+}
+
+.cs-nav-title {
+  color: var(--cs-fg);
+}

@@ -1,0 +1,6 @@
+{{- /* Project pages only: each H2 gets a numbered eyebrow ("01 · Context"). The number comes from a CSS counter
+       (assets/css/case-study.css); the eyebrow is aria-hidden so screen readers don't hear the heading twice. */ -}}
+{{- if eq .Level 2 -}}
+<p class="cs-eyebrow" aria-hidden="true">{{ .PlainText }}</p>
+{{- end -}}
+<h{{ .Level }} id="{{ .Anchor }}"{{ with .Attributes.class }} class="{{ . }}"{{ end }}>{{ .Text }}</h{{ .Level }}>
